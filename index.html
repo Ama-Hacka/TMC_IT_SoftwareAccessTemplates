@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Access Template Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #searchBar:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 20px;
+        }
+
+        .filter-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        select {
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+            background: white;
+            transition: all 0.3s;
+        }
+
+        select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .role-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            animation: fadeIn 0.5s;
+        }
+
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .role-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #f0f0f0;
+        }
+
+        .role-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .role-department {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .software-list {
+            list-style: none;
+        }
+
+        .software-item {
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .software-item:hover {
+            transform: translateX(5px);
+        }
+
+        .software-item::before {
+            content: "●";
+            font-size: 12px;
+        }
+
+        /* Color coding for different software types */
+        .software-item[data-category="pms"] {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-left: 4px solid #1565c0;
+        }
+
+        .software-item[data-category="pos"] {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            border-left: 4px solid #7b1fa2;
+        }
+
+        .software-item[data-category="communication"] {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .software-item[data-category="finance"] {
+            background: #fff3e0;
+            color: #e65100;
+            border-left: 4px solid #e65100;
+        }
+
+        .software-item[data-category="hr"] {
+            background: #fce4ec;
+            color: #c2185b;
+            border-left: 4px solid #c2185b;
+        }
+
+        .software-item[data-category="productivity"] {
+            background: #e0f2f1;
+            color: #00695c;
+            border-left: 4px solid #00695c;
+        }
+
+        .software-item[data-category="reporting"] {
+            background: #fff9c4;
+            color: #f57f17;
+            border-left: 4px solid #f57f17;
+        }
+
+        .software-item[data-category="inventory"] {
+            background: #ede7f6;
+            color: #4527a0;
+            border-left: 4px solid #4527a0;
+        }
+
+        .software-item[data-category="reservation"] {
+            background: #e1f5fe;
+            color: #01579b;
+            border-left: 4px solid #01579b;
+        }
+
+        .software-item[data-category="other"] {
+            background: #f5f5f5;
+            color: #616161;
+            border-left: 4px solid #616161;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .no-results h2 {
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .no-results p {
+            color: #95a5a6;
+        }
+
+        .legend {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        .legend h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .legend-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .clear-filters {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .clear-filters:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .pagination {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .pagination button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 100px;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .pagination button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .pagination .page-info {
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: 500;
+            padding: 0 20px;
+        }
+
+        .pagination .page-numbers {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pagination .page-number {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 45px;
+        }
+
+        .pagination .page-number:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .pagination .page-number.active {
+            background: #667eea;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-container {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .legend-items {
+                grid-template-columns: 1fr;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+            }
+
+            .pagination .page-numbers {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏨 TMCH Roles & Software Access Templates</h1>
+            <p class="subtitle">Template Viewer - Search and filter by role or software</p>
+            
+            <div class="controls">
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="searchBar" 
+                        placeholder="Search by role name or software..."
+                        autocomplete="off"
+                    >
+                    <span class="search-icon">🔍</span>
+                </div>
+                
+                <div class="filter-container">
+                    <select id="roleFilter">
+                        <option value="">All Roles</option>
+                    </select>
+                    <select id="softwareFilter">
+                        <option value="">All Software</option>
+                    </select>
+                </div>
+
+                <button class="clear-filters" id="clearFilters">Clear All Filters</button>
+            </div>
+        </header>
+
+        <div class="cards-container" id="cardsContainer"></div>
+
+        <div class="pagination" id="pagination">
+            <button id="prevBtn">← Previous</button>
+            <div class="page-numbers" id="pageNumbers"></div>
+            <div class="page-info" id="pageInfo"></div>
+            <button id="nextBtn">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        // Hospitality roles and their software access
+        const rolesData = [
+            {
+                role: "Chef / Sous_Chef / Barback",
+                department: "Culinary",
+                software: [
+                    { name: "StayNTouch", category: "pms" },
+                    { name: "RemoteLock Pin", category: "other" }
+                ]
+            },
+            {
+                role: "Barista / Bartender",
+                department: "Food & Beverage",
+                software: [
+                    { name: "Gmail", category: "communication" },
+                    { name: "StayNTouch", category: "pms" },
+                    { name: "Chat (Zenzapp)", category: "communication" },
+                    { name: "RemoteLock Pin", category: "other" },
+                    { name: "Akia", category: "communication" }
+                ]
+            },
+            {
+                role: "House Keeper",
+                department: "Housekeeping",
+                software: [
+                    { name: "Gmail", category: "communication" },
+                    { name: "StayNTouch", category: "pms" },
+                    { name: "Chat (Zenzapp)", category: "communication" },
+                    { name: "RemoteLock Pin", category: "other" },
+                    { name: "Akia", category: "communication" },
+                    { name: "Maitre", category: "other" }
+                ]
+            },
+            {
+                role: "Front Desk / GEA / SAGEC / Sales",
+                department: "Front Office",
+                software: [
+                    { name: "Gmail", category: "communication" },
+                    { name: "StayNTouch", category: "pms" },
+                    { name: "Chat (Zenzapp)", category: "communication" },
+                    { name: "RemoteLock Pin", category: "other" },
+                    { name: "RemoteLock Admin", category: "other" },
+                    { name: "Akia", category: "communication" },
+                    { name: "Maitre", category: "other" },
+                    { name: "Email Signature", category: "communication" }
+                ]
+            },
+            {
+                role: "Engineer",
+                department: "Engineering",
+                software: [
+                    { name: "Gmail", category: "communication" },
+                    { name: "StayNTouch", category: "pms" },
+                    { name: "Chat (Zenzapp)", category: "communication" },
+                    { name: "RemoteLock Pin", category: "other" },
+                    { name: "RemoteLock Admin", category: "other" },
+                    { name: "Akia", category: "communication" },
+                    { name: "Maitre", category: "other" },
+                    { name: "Sonify (Property Applicable)", category: "other" }
+                ]
+            },
+            {
+                role: "HouseKeeping Supervisor",
+                department: "Housekeeping",
+                software: [
+                    { name: "Gmail", category: "communication" },
+                    { name: "StayNTouch", category: "pms" },
+                    { name: "Chat (Zenzapp)", category: "communication" },
+                    { name: "RemoteLock Pin", category: "other" },
+                    { name: "RemoteLock Admin", category: "other" },
+                    { name: "Akia", category: "communication" },
+                    { name: "Maitre (Admin)", category: "other" },
+                    { name: "Email Signature", category: "communication" }
+                ]
+            },
+            {
+                role: "F&B Supervisor / Manager",
+                department: "Food & Beverage",
+                software: [
+                    { name: "Gmail", category: "communication" },
+                    { name: "StayNTouch", category: "pms" },
+                    { name: "Chat (Zenzapp)", category: "communication" },
+                    { name: "RemoteLock Pin", category: "other" },
+                    { name: "RemoteLock Admin", category: "other" },
+                    { name: "Akia", category: "communication" },
+                    { name: "Maitre (Admin)", category: "other" },
+                    { name: "Email Signature", category: "communication" },
+                    { name: "Shopify", category: "other" }
+                ]
+            }
+        ];
+
+        // DOM Elements
+        const searchBar = document.getElementById('searchBar');
+        const roleFilter = document.getElementById('roleFilter');
+        const softwareFilter = document.getElementById('softwareFilter');
+        const cardsContainer = document.getElementById('cardsContainer');
+        const clearFiltersBtn = document.getElementById('clearFilters');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageInfo = document.getElementById('pageInfo');
+        const pageNumbers = document.getElementById('pageNumbers');
+
+        // Pagination variables
+        const ITEMS_PER_PAGE = 3;
+        let currentPage = 1;
+        let filteredData = [];
+
+        // Initialize the app
+        function init() {
+            populateFilters();
+            filteredData = rolesData;
+            displayCurrentPage();
+            attachEventListeners();
+        }
+
+        // Populate filter dropdowns
+        function populateFilters() {
+            // Get unique roles
+            const roles = [...new Set(rolesData.map(item => item.role))].sort();
+            roles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role;
+                option.textContent = role;
+                roleFilter.appendChild(option);
+            });
+
+            // Get unique software
+            const allSoftware = rolesData.flatMap(role => role.software.map(s => s.name));
+            const uniqueSoftware = [...new Set(allSoftware)].sort();
+            uniqueSoftware.forEach(software => {
+                const option = document.createElement('option');
+                option.value = software;
+                option.textContent = software;
+                softwareFilter.appendChild(option);
+            });
+        }
+
+        // Display current page
+        function displayCurrentPage() {
+            const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+            
+            // Ensure current page is valid
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+            if (currentPage < 1) {
+                currentPage = 1;
+            }
+
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            displayCards(pageData);
+            updatePagination(totalPages);
+        }
+
+        // Display role cards
+        function displayCards(data) {
+            cardsContainer.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                cardsContainer.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">🔍</div>
+                        <h2>No Results Found</h2>
+                        <p>Try adjusting your search or filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            data.forEach(roleData => {
+                const card = createRoleCard(roleData);
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        // Create a role card
+        function createRoleCard(roleData) {
+            const card = document.createElement('div');
+            card.className = 'role-card';
+
+            const softwareList = roleData.software.map(software => `
+                <li class="software-item" data-category="${software.category}">
+                    ${software.name}
+                </li>
+            `).join('');
+
+            card.innerHTML = `
+                <div class="role-header">
+                    <div class="role-name">${roleData.role}</div>
+                    <div class="role-department">${roleData.department}</div>
+                </div>
+                <ul class="software-list">
+                    ${softwareList}
+                </ul>
+            `;
+
+            return card;
+        }
+
+        // Update pagination controls
+        function updatePagination(totalPages) {
+            if (filteredData.length === 0) {
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('pagination').style.display = 'flex';
+
+            // Update page info
+            const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+            const endItem = Math.min(currentPage * ITEMS_PER_PAGE, filteredData.length);
+            pageInfo.textContent = `${startItem}-${endItem} of ${filteredData.length}`;
+
+            // Update buttons state
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+
+            // Update page numbers
+            pageNumbers.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = 'page-number';
+                pageBtn.textContent = i;
+                if (i === currentPage) {
+                    pageBtn.classList.add('active');
+                }
+                pageBtn.addEventListener('click', () => {
+                    currentPage = i;
+                    displayCurrentPage();
+                });
+                pageNumbers.appendChild(pageBtn);
+            }
+        }
+
+        // Filter data based on search and dropdowns
+        function filterData() {
+            const searchTerm = searchBar.value.toLowerCase().trim();
+            const selectedRole = roleFilter.value;
+            const selectedSoftware = softwareFilter.value;
+
+            filteredData = rolesData;
+
+            // Filter by role dropdown
+            if (selectedRole) {
+                filteredData = filteredData.filter(item => item.role === selectedRole);
+            }
+
+            // Filter by software dropdown
+            if (selectedSoftware) {
+                filteredData = filteredData.filter(item => 
+                    item.software.some(s => s.name === selectedSoftware)
+                );
+            }
+
+            // Filter by search bar
+            if (searchTerm) {
+                filteredData = filteredData.filter(item => {
+                    const roleMatch = item.role.toLowerCase().includes(searchTerm);
+                    const softwareMatch = item.software.some(s => 
+                        s.name.toLowerCase().includes(searchTerm)
+                    );
+                    const departmentMatch = item.department.toLowerCase().includes(searchTerm);
+                    return roleMatch || softwareMatch || departmentMatch;
+                });
+            }
+
+            currentPage = 1; // Reset to first page when filtering
+            displayCurrentPage();
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            searchBar.value = '';
+            roleFilter.value = '';
+            softwareFilter.value = '';
+            filteredData = rolesData;
+            currentPage = 1;
+            displayCurrentPage();
+        }
+
+        // Go to previous page
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayCurrentPage();
+            }
+        }
+
+        // Go to next page
+        function nextPage() {
+            const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayCurrentPage();
+            }
+        }
+
+        // Attach event listeners
+        function attachEventListeners() {
+            searchBar.addEventListener('input', filterData);
+            roleFilter.addEventListener('change', filterData);
+            softwareFilter.addEventListener('change', filterData);
+            clearFiltersBtn.addEventListener('click', clearAllFilters);
+            prevBtn.addEventListener('click', previousPage);
+            nextBtn.addEventListener('click', nextPage);
+        }
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+</html>
