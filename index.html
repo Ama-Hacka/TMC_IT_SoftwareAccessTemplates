@@ -25,30 +25,30 @@
 
         header {
             background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin-bottom: 30px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
         h1 {
             color: #2c3e50;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
             text-align: center;
         }
 
         .subtitle {
             text-align: center;
             color: #7f8c8d;
-            font-size: 1.1rem;
-            margin-bottom: 30px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
         }
 
         .controls {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
         }
 
         .search-container {
@@ -58,10 +58,10 @@
 
         #searchBar {
             width: 100%;
-            padding: 15px 50px 15px 20px;
-            font-size: 16px;
+            padding: 10px 40px 10px 15px;
+            font-size: 14px;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            border-radius: 8px;
             outline: none;
             transition: all 0.3s;
         }
@@ -73,24 +73,24 @@
 
         .search-icon {
             position: absolute;
-            right: 20px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
             color: #7f8c8d;
-            font-size: 20px;
+            font-size: 16px;
         }
 
         .filter-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 10px;
         }
 
         select {
-            padding: 15px;
-            font-size: 16px;
+            padding: 10px;
+            font-size: 14px;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            border-radius: 8px;
             outline: none;
             cursor: pointer;
             background: white;
@@ -116,11 +116,76 @@
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
             transition: all 0.3s;
             animation: fadeIn 0.5s;
+            border-top: 5px solid #ccc;
         }
 
         .role-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Professional color palette for each role */
+        .role-card[data-role="Chef / Sous_Chef / Barback"] {
+            border-top-color: #FF6B6B;
+            background: linear-gradient(to bottom, #fff5f5 0%, white 20%);
+        }
+
+        .role-card[data-role="Chef / Sous_Chef / Barback"] .role-name {
+            color: #FF6B6B;
+        }
+
+        .role-card[data-role="Barista / Bartender"] {
+            border-top-color: #4ECDC4;
+            background: linear-gradient(to bottom, #f0fffe 0%, white 20%);
+        }
+
+        .role-card[data-role="Barista / Bartender"] .role-name {
+            color: #4ECDC4;
+        }
+
+        .role-card[data-role="House Keeper"] {
+            border-top-color: #FF9F43;
+            background: linear-gradient(to bottom, #fff8f0 0%, white 20%);
+        }
+
+        .role-card[data-role="House Keeper"] .role-name {
+            color: #EE5A24;
+        }
+
+        .role-card[data-role="Front Desk / GEA / SAGEC / Sales"] {
+            border-top-color: #6C5CE7;
+            background: linear-gradient(to bottom, #f6f5ff 0%, white 20%);
+        }
+
+        .role-card[data-role="Front Desk / GEA / SAGEC / Sales"] .role-name {
+            color: #6C5CE7;
+        }
+
+        .role-card[data-role="Engineer"] {
+            border-top-color: #FD79A8;
+            background: linear-gradient(to bottom, #fff5f9 0%, white 20%);
+        }
+
+        .role-card[data-role="Engineer"] .role-name {
+            color: #E84393;
+        }
+
+        .role-card[data-role="HouseKeeping Supervisor"] {
+            border-top-color: #FDCB6E;
+            background: linear-gradient(to bottom, #fffbf0 0%, white 20%);
+        }
+
+        .role-card[data-role="HouseKeeping Supervisor"] .role-name {
+            color: #E17055;
+        }
+
+        .role-card[data-role="F&B Supervisor / Manager"] {
+            border-top-color: #74B9FF;
+            background: linear-gradient(to bottom, #f0f8ff 0%, white 20%);
+        }
+
+        .role-card[data-role="F&B Supervisor / Manager"] .role-name {
+            color: #0984E3;
         }
 
         @keyframes fadeIn {
@@ -292,13 +357,13 @@
             background: #e74c3c;
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
+            padding: 8px 18px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             transition: all 0.3s;
-            margin-top: 15px;
+            margin-top: 5px;
         }
 
         .clear-filters:hover {
@@ -630,6 +695,7 @@
         function createRoleCard(roleData) {
             const card = document.createElement('div');
             card.className = 'role-card';
+            card.setAttribute('data-role', roleData.role);
 
             const softwareList = roleData.software.map(software => `
                 <li class="software-item" data-category="${software.category}">
